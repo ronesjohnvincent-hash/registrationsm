@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoboTech League 2026 - Competition Registration & Admin Dashboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#0a0f24',
+              card: '#121936',
+              border: '#1e295d',
+              electric: '#0066ff',
+              cyan: '#00f0ff',
+              accent: '#ff0055',
+              slate: '#1e293b'
+            }
+          },
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            rajdhani: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0a0f24;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 102, 255, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.1) 0%, transparent 40%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    }
+
+    .glass-panel {
+      background: rgba(18, 25, 54, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(30, 41, 93, 0.8);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    }
+
+    .gradient-button {
+      background: linear-gradient(135deg, #0066ff 0%, #00f0ff 100%);
+      transition: all 0.3s ease;
+    }
+
+    .gradient-button:hover {
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .custom-checkbox:checked {
+      background-color: #00f0ff;
+      border-color: #00f0ff;
+    }
+
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .glass-panel, .glass-card {
+        background: none !important;
+        border: 1px solid #ccc !important;
+        color: black !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-900">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="no-print sticky top-0 z-40 w-full border-b border-brand-border bg-brand-bg/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- LOGO -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('public-registration')">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-electric to-brand-cyan p-0.5 shadow-lg shadow-cyan-500/20">
+            <div class="w-full h-full bg-brand-bg rounded-[10px] flex items-center justify-center">
+              <i data-lucide="bot" class="w-7 h-7 text-brand-cyan animate-pulse"></i>
+            </div>
+          </div>
+          <div>
+            <h1 class="font-orbitron font-extrabold text-xl sm:text-2xl tracking-wider text-white">
+              ROBO<span class="text-brand-cyan">TECH</span> <span class="text-xs px-2 py-0.5 rounded bg-brand-electric/20 border border-brand-electric text-cyan-300 font-sans">2026</span>
+            </h1>
+            <p class="text-xs text-slate-400 font-rajdhani tracking-widest uppercase">National STEM Robotics Championship</p>
+          </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="hidden md:flex items-center space-x-2">
+          <button id="nav-public-registration" onclick="switchTab('public-registration')" 
+                  class="nav-tab-btn px-4 py-2 rounded-lg font-rajdhani font-semibold text-base tracking-wide flex items-center space-x-2 transition-all bg-brand-electric/20 text-brand-cyan border border-brand-cyan/30">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Register</span>
+          </button>
+          
+          <button id="nav-registration-lookup" onclick="switchTab('registration-lookup')" 
+                  class="nav-tab-btn px-4 py-2 rounded-lg font-rajdhani font-semibold text-base tracking-wide flex items-center space-x-2 transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Check Pass</span>
+          </button>
+
+          <button id="nav-admin" onclick="handleAdminNavClick()" 
+                  class="nav-tab-btn px-4 py-2 rounded-lg font-rajdhani font-semibold text-base tracking-wide flex items-center space-x-2 transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent">
+            <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i>
+            <span>Admin Portal</span>
+            <span id="admin-auth-badge" class="hidden text-xs bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/40">Logged In</span>
+          </button>
+
+          <button id="nav-setup-guide" onclick="switchTab('setup-guide')" 
+                  class="nav-tab-btn px-3 py-2 rounded-lg text-slate-400 hover:text-cyan-400 transition-all text-xs flex items-center space-x-1">
+            <i data-lucide="database" class="w-4 h-4"></i>
+            <span>Setup & Docs</span>
+          </button>
+        </nav>
+
+        <!-- MOBILE MENU BUTTON -->
+        <div class="flex md:hidden">
+          <button onclick="toggleMobileMenu()" class="text-slate-300 hover:text-white p-2">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE NAVIGATION DROPDOWN -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-brand-border bg-brand-card px-4 pt-2 pb-4 space-y-2">
+      <button onclick="switchTab('public-registration'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-rajdhani font-semibold text-brand-cyan bg-brand-electric/10">
+        Registration Form
+      </button>
+      <button onclick="switchTab('registration-lookup'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-rajdhani font-semibold text-slate-300">
+        Verify Pass / Unique ID
+      </button>
+      <button onclick="handleAdminNavClick(); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-rajdhani font-semibold text-slate-300">
+        Admin Portal
+      </button>
+      <button onclick="switchTab('setup-guide'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-rajdhani font-semibold text-slate-400 text-sm">
+        Firebase & Database Setup
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- NOTIFICATION MESSAGES BANNER -->
+    <div id="toast-banner" class="hidden mb-6 p-4 rounded-xl border flex items-center justify-between transition-all duration-300">
+      <div class="flex items-center space-x-3">
+        <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
+        <span id="toast-message" class="font-medium text-sm"></span>
+      </div>
+      <button onclick="closeToast()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- ==================== TAB 1: PUBLIC REGISTRATION FORM ==================== -->
+    <section id="tab-public-registration" class="tab-content block">
+      <div class="max-w-4xl mx-auto">
+        
+        <!-- HERO TITLE -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-3">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Official Entry Form • Season 2026</span>
+          </div>
+          <h2 class="font-orbitron font-extrabold text-3xl sm:text-4xl text-white tracking-wide">
+            PARTICIPANT REGISTRATION
+          </h2>
+          <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+            Select individual robotics challenges or assemble your team for high-stakes arena battles.
+          </p>
+        </div>
+
+        <!-- MAIN FORM -->
+        <form id="registration-form" onsubmit="handleRegistrationSubmit(event)" class="glass-panel rounded-2xl p-6 sm:p-10 space-y-8">
+          
+          <!-- PERSONAL INFORMATION -->
+          <div class="space-y-4">
+            <div class="flex items-center space-x-2 border-b border-brand-border pb-3">
+              <i data-lucide="user" class="w-5 h-5 text-brand-cyan"></i>
+              <h3 class="font-orbitron font-semibold text-lg text-white">1. Personal Details</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <!-- Full Name -->
+              <div class="md:col-span-1">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Full Name *</label>
+                <input type="text" id="reg-fullname" required placeholder="e.g. Alex Rivera"
+                  class="w-full bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none text-sm">
+              </div>
+
+              <!-- Age -->
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Age *</label>
+                <input type="number" id="reg-age" min="7" max="25" required placeholder="e.g. 16"
+                  class="w-full bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none text-sm">
+              </div>
+
+              <!-- Grade and Section -->
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Grade & Section *</label>
+                <input type="text" id="reg-grade" required placeholder="e.g. Grade 10 - STEM A"
+                  class="w-full bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- COMPETITION SELECTION -->
+          <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-brand-border pb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="trophy" class="w-5 h-5 text-brand-cyan"></i>
+                <h3 class="font-orbitron font-semibold text-lg text-white">2. Select Competitions</h3>
+              </div>
+              <span class="text-xs text-brand-cyan">Select all that apply</span>
+            </div>
+
+            <!-- TEAM COMPETITIONS GRID -->
+            <div>
+              <h4 class="text-xs font-orbitron font-semibold tracking-wider text-brand-cyan uppercase mb-3 flex items-center">
+                <i data-lucide="users" class="w-4 h-4 mr-1.5"></i> Team Competitions (Requires Roster)
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                
+                <label class="glass-card p-4 rounded-xl cursor-pointer flex items-start space-x-3 border hover:border-brand-cyan transition-all">
+                  <input type="checkbox" value="Soccer 2v2" name="competitions" data-type="team" data-size="2" onchange="updateTeamFields()" class="mt-1 custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <div>
+                    <span class="font-bold text-white block text-sm">Robo Soccer 2v2</span>
+                    <span class="text-xs text-slate-400">Team Size: Exact 2 Members</span>
+                  </div>
+                </label>
+
+                <label class="glass-card p-4 rounded-xl cursor-pointer flex items-start space-x-3 border hover:border-brand-cyan transition-all">
+                  <input type="checkbox" value="Soccer 3v3" name="competitions" data-type="team" data-size="3" onchange="updateTeamFields()" class="mt-1 custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <div>
+                    <span class="font-bold text-white block text-sm">Robo Soccer 3v3</span>
+                    <span class="text-xs text-slate-400">Team Size: Exact 3 Members</span>
+                  </div>
+                </label>
+
+                <label class="glass-card p-4 rounded-xl cursor-pointer flex items-start space-x-3 border hover:border-brand-cyan transition-all">
+                  <input type="checkbox" value="Soccer 5v5" name="competitions" data-type="team" data-size="5" onchange="updateTeamFields()" class="mt-1 custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <div>
+                    <span class="font-bold text-white block text-sm">Robo Soccer 5v5</span>
+                    <span class="text-xs text-slate-400">Team Size: Exact 5 Members</span>
+                  </div>
+                </label>
+
+                <label class="glass-card p-4 rounded-xl cursor-pointer flex items-start space-x-3 border hover:border-brand-cyan transition-all">
+                  <input type="checkbox" value="Sumo 2v2" name="competitions" data-type="team" data-size="2" onchange="updateTeamFields()" class="mt-1 custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <div>
+                    <span class="font-bold text-white block text-sm">Robo Sumo 2v2</span>
+                    <span class="text-xs text-slate-400">Team Size: Exact 2 Members</span>
+                  </div>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- INDIVIDUAL COMPETITIONS GRID -->
+            <div>
+              <h4 class="text-xs font-orbitron font-semibold tracking-wider text-slate-400 uppercase mb-3 flex items-center">
+                <i data-lucide="user-check" class="w-4 h-4 mr-1.5 text-brand-cyan"></i> Individual Competitions
+              </h4>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Individual Robo Soccer" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Robo Soccer</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Individual Robo Sumo" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Robo Sumo</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Nano Car Racing" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Nano Car Racing</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Drag Racing" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Drag Racing</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Obstacle Avoidance" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Obstacle Avoidance</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2">
+                  <input type="checkbox" value="Precision Parking" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Precision Parking</span>
+                </label>
+
+                <label class="glass-card p-3 rounded-lg cursor-pointer flex items-center space-x-2 sm:col-span-2 md:col-span-1">
+                  <input type="checkbox" value="Drag and Brake" name="competitions" data-type="individual" class="custom-checkbox h-4 w-4 rounded accent-cyan-400">
+                  <span class="text-xs font-medium text-slate-200">Drag and Brake</span>
+                </label>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- DYNAMIC TEAM DETAILS SECTION (Conditional View) -->
+          <div id="team-details-section" class="hidden space-y-6 pt-4 border-t border-brand-border">
+            <div class="flex items-center space-x-2 text-brand-cyan">
+              <i data-lucide="users-round" class="w-5 h-5"></i>
+              <h3 class="font-orbitron font-semibold text-lg text-white">3. Team & Member Details</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Team Name *</label>
+                <input type="text" id="reg-team-name" placeholder="e.g. Cyber Titans Alpha"
+                  class="w-full bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Team Captain Name *</label>
+                <input type="text" id="reg-team-captain" placeholder="e.g. Alex Rivera (Primary Contact)"
+                  class="w-full bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none text-sm">
+              </div>
+            </div>
+
+            <div id="team-members-container" class="space-y-4">
+              <!-- Dynamically generated based on maximum team size needed -->
+            </div>
+          </div>
+
+          <!-- SUBMIT ACTION BUTTON -->
+          <div class="pt-4 border-t border-brand-border">
+            <button type="submit" id="submit-btn" class="w-full gradient-button text-slate-950 font-orbitron font-bold text-base py-4 rounded-xl flex items-center justify-center space-x-2 tracking-wider">
+              <span>CONFIRM & SUBMIT REGISTRATION</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: REGISTRATION CONFIRMATION PASS ==================== -->
+    <section id="tab-registration-lookup" class="tab-content hidden">
+      <div class="max-w-2xl mx-auto">
+        
+        <!-- LOOKUP CARD IF SEARCHING -->
+        <div class="glass-panel rounded-2xl p-6 mb-8 text-center no-print">
+          <h3 class="font-orbitron text-xl font-bold text-white mb-2">Check Registration Pass</h3>
+          <p class="text-xs text-slate-400 mb-4">Enter your unique ID (e.g., ROB-2026-X89K2) to view and print your entry badge.</p>
+          <div class="flex gap-2 max-w-md mx-auto">
+            <input type="text" id="lookup-id-input" placeholder="ROB-2026-XXXXX" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white font-mono uppercase text-sm">
+            <button onclick="handleLookupPass()" class="px-5 py-2 bg-brand-electric hover:bg-blue-600 rounded-lg font-semibold text-white text-sm">
+              Search
+            </button>
+          </div>
+        </div>
+
+        <!-- REGISTRATION CONFIRMATION BADGE CARD -->
+        <div id="pass-card" class="glass-panel rounded-2xl border-2 border-brand-cyan/40 p-8 shadow-2xl space-y-6 relative overflow-hidden">
+          
+          <div class="absolute top-0 right-0 transform translate-x-8 -translate-y-8 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
+
+          <div class="flex justify-between items-start border-b border-brand-border pb-6">
+            <div>
+              <span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold rounded-full mb-2">
+                VERIFIED ENTRY PASS
+              </span>
+              <h2 class="font-orbitron font-bold text-2xl text-white">ROBOTECH 2026</h2>
+              <p class="text-xs text-slate-400">Official Participant Credentials</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block font-mono">REGISTRATION ID</span>
+              <span id="pass-id" class="font-mono text-xl font-extrabold text-brand-cyan tracking-wider">ROB-2026-DEMO</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-xs text-slate-400 block">Participant Name</span>
+              <span id="pass-name" class="font-bold text-white text-base">Alex Rivera</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block">Grade & Section</span>
+              <span id="pass-grade" class="font-semibold text-slate-200">Grade 10 - STEM A</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block">Age</span>
+              <span id="pass-age" class="font-semibold text-slate-200">16</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block">Status</span>
+              <span id="pass-status" class="inline-block px-2 py-0.5 text-xs font-bold rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">PENDING APPROVAL</span>
+            </div>
+          </div>
+
+          <div class="border-t border-brand-border pt-4">
+            <span class="text-xs text-slate-400 block mb-2 font-orbitron uppercase tracking-wider">Registered Events</span>
+            <div id="pass-events" class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 bg-slate-800 text-slate-200 text-xs rounded border border-slate-700">Robo Soccer 2v2</span>
+              <span class="px-2.5 py-1 bg-slate-800 text-slate-200 text-xs rounded border border-slate-700">Obstacle Avoidance</span>
+            </div>
+          </div>
+
+          <div id="pass-team-info" class="hidden border-t border-brand-border pt-4">
+            <span class="text-xs text-brand-cyan block mb-1 font-orbitron">TEAM ROSTER DETAILS</span>
+            <div class="text-xs space-y-1">
+              <p><strong class="text-slate-300">Team Name:</strong> <span id="pass-team-name" class="text-white">Cyber Titans</span></p>
+              <p><strong class="text-slate-300">Captain:</strong> <span id="pass-team-captain" class="text-white">Alex Rivera</span></p>
+              <p><strong class="text-slate-300">Members:</strong> <span id="pass-team-members" class="text-slate-300">Jordan Lee, Sam Taylor</span></p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between border-t border-brand-border pt-6 no-print">
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-semibold flex items-center space-x-2">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>Print Confirmation</span>
+            </button>
+            
+            <button onclick="switchTab('public-registration')" class="px-4 py-2 border border-brand-cyan text-brand-cyan hover:bg-cyan-950 rounded-lg text-sm font-semibold">
+              Register Another
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: ADMIN LOGIN VIEW ==================== -->
+    <section id="tab-admin-login" class="tab-content hidden">
+      <div class="max-w-md mx-auto pt-4 sm:pt-8">
+        <div class="glass-panel rounded-2xl p-6 sm:p-8 space-y-6 border border-brand-cyan/30">
+          
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-brand-cyan/10 flex items-center justify-center text-brand-cyan border border-brand-cyan/30">
+              <i data-lucide="lock" class="w-7 h-7"></i>
+            </div>
+            <h2 class="font-orbitron font-bold text-2xl text-white">ADMINISTRATOR AUTH</h2>
+            <p class="text-xs text-slate-400 mt-1">Authorized Official Personnel Access Only</p>
+          </div>
+
+          <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Admin Email</label>
+              <input type="email" id="admin-email" required placeholder="admin@robotics.com"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:border-brand-cyan outline-none text-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Password</label>
+              <input type="password" id="admin-password" required placeholder="••••••••"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:border-brand-cyan outline-none text-sm">
+            </div>
+
+            <button type="submit" class="w-full gradient-button text-slate-950 font-orbitron font-bold py-3 rounded-lg text-sm tracking-wider">
+              AUTHENTICATE ADMIN
+            </button>
+          </form>
+
+          <!-- 1-CLICK DEMO LOGIN BOX -->
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-cyan-500/30 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-brand-cyan flex items-center">
+                <i data-lucide="key" class="w-3.5 h-3.5 mr-1.5"></i> Demo Credentials
+              </span>
+              <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Ready</span>
+            </div>
+            <div class="text-xs text-slate-300 space-y-0.5 font-mono">
+              <p><span class="text-slate-500">Email:</span> admin@robotics.com</p>
+              <p><span class="text-slate-500">Pass:</span> admin123456</p>
+            </div>
+            <button type="button" onclick="autoFillAndLoginDemoAdmin()" class="w-full py-2 bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border border-brand-cyan/40 rounded-lg text-xs font-bold font-orbitron transition-all flex items-center justify-center space-x-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+              <span>1-CLICK DEMO LOGIN</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: PRIVATE ADMIN DASHBOARD ==================== -->
+    <section id="tab-admin-dashboard" class="tab-content hidden space-y-8">
+      
+      <!-- DASHBOARD HEADER -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-border pb-6">
+        <div>
+          <h2 class="font-orbitron font-extrabold text-2xl sm:text-3xl text-white flex items-center">
+            <span>ADMIN CONTROL CENTER</span>
+            <span class="ml-3 text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 px-2 py-0.5 rounded font-sans">LIVE SYSTEM</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Manage all competition submissions, filter participant records, and export rosters.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button onclick="loadMockSampleData()" class="px-3 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold font-orbitron flex items-center space-x-1.5 transition-all">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+            <span>ADD MOCK DATA</span>
+          </button>
+
+          <button onclick="exportToCSV()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold font-orbitron flex items-center space-x-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-brand-cyan"></i>
+            <span>EXPORT CSV</span>
+          </button>
+          
+          <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold font-orbitron flex items-center space-x-1.5">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>PRINT LIST</span>
+          </button>
+
+          <!-- System Reset Button -->
+          <button onclick="openResetModal()" class="px-3 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/40 rounded-lg text-xs font-bold font-orbitron flex items-center space-x-1.5 transition-all">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>RESET SYSTEM</span>
+          </button>
+
+          <button onclick="handleAdminLogout()" class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- METRICS CARDS OVERVIEW -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        
+        <div class="glass-card p-5 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-orbitron uppercase">Total Participants</span>
+            <i data-lucide="users" class="w-4 h-4 text-brand-cyan"></i>
+          </div>
+          <span id="metric-total-participants" class="font-orbitron text-2xl sm:text-3xl font-extrabold text-white">0</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-orbitron uppercase">Total Entries</span>
+            <i data-lucide="trophy" class="w-4 h-4 text-yellow-400"></i>
+          </div>
+          <span id="metric-total-entries" class="font-orbitron text-2xl sm:text-3xl font-extrabold text-white">0</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-orbitron uppercase">Teams Registered</span>
+            <i data-lucide="swords" class="w-4 h-4 text-brand-electric"></i>
+          </div>
+          <span id="metric-team-count" class="font-orbitron text-2xl sm:text-3xl font-extrabold text-white">0</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-orbitron uppercase">Pending Review</span>
+            <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <span id="metric-pending-count" class="font-orbitron text-2xl sm:text-3xl font-extrabold text-amber-400">0</span>
+        </div>
+
+      </div>
+
+      <!-- SEARCH & FILTERS TOOLBAR -->
+      <div class="glass-panel p-4 rounded-xl space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          
+          <!-- Search input -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Search Record</label>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-500"></i>
+              <input type="text" id="admin-search-input" oninput="renderAdminTable()" placeholder="Name, Team, or ROB-ID..."
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-brand-cyan">
+            </div>
+          </div>
+
+          <!-- Competition Category Filter -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Filter Competition</label>
+            <select id="admin-filter-competition" onchange="renderAdminTable()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-brand-cyan">
+              <option value="ALL">All Competitions</option>
+              <optgroup label="Team Competitions">
+                <option value="Soccer 2v2">Robo Soccer 2v2</option>
+                <option value="Soccer 3v3">Robo Soccer 3v3</option>
+                <option value="Soccer 5v5">Robo Soccer 5v5</option>
+                <option value="Sumo 2v2">Robo Sumo 2v2</option>
+              </optgroup>
+              <optgroup label="Individual Competitions">
+                <option value="Individual Robo Soccer">Robo Soccer (Ind)</option>
+                <option value="Individual Robo Sumo">Robo Sumo (Ind)</option>
+                <option value="Nano Car Racing">Nano Car Racing</option>
+                <option value="Drag Racing">Drag Racing</option>
+                <option value="Obstacle Avoidance">Obstacle Avoidance</option>
+                <option value="Precision Parking">Precision Parking</option>
+                <option value="Drag and Brake">Drag and Brake</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Grade / Section Filter -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Filter Type</label>
+            <select id="admin-filter-type" onchange="renderAdminTable()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-brand-cyan">
+              <option value="ALL">All Registration Types</option>
+              <option value="TEAM">Team Registrations Only</option>
+              <option value="INDIVIDUAL">Individual Registrations Only</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Filter Status</label>
+            <select id="admin-filter-status" onchange="renderAdminTable()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-brand-cyan">
+              <option value="ALL">All Statuses</option>
+              <option value="Approved">Approved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- REGISTRATIONS DATA TABLE -->
+      <div class="glass-panel rounded-xl overflow-hidden border border-brand-border">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 font-orbitron text-slate-300 uppercase tracking-wider border-b border-brand-border">
+              <tr>
+                <th class="p-4">Reg ID</th>
+                <th class="p-4">Participant</th>
+                <th class="p-4">Grade & Sec</th>
+                <th class="p-4">Competitions Selected</th>
+                <th class="p-4">Team Info</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body" class="divide-y divide-slate-800/60 font-sans">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+        <div id="no-records-msg" class="hidden p-12 text-center text-slate-400 text-sm space-y-3">
+          <div class="w-12 h-12 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-slate-500">
+            <i data-lucide="inbox" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="font-orbitron font-semibold text-white">No registrations found in system yet</p>
+            <p class="text-xs text-slate-500 mt-0.5">Submit new entries using the public registration form or click 'ADD MOCK DATA'.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPETITION BREAKDOWN COUNT CARDS -->
+      <div class="space-y-4">
+        <h3 class="font-orbitron font-bold text-lg text-white">Entries Count Per Event</h3>
+        <div id="competition-counts-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <!-- Populated in JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 5: BACKEND SETUP & DOCUMENTATION GUIDE ==================== -->
+    <section id="tab-setup-guide" class="tab-content hidden">
+      <div class="max-w-4xl mx-auto glass-panel rounded-2xl p-8 space-y-6">
+        <div class="flex items-center space-x-3 border-b border-brand-border pb-4">
+          <i data-lucide="database" class="w-7 h-7 text-brand-cyan"></i>
+          <div>
+            <h2 class="font-orbitron font-bold text-xl text-white">Database & Persistence Guide</h2>
+            <p class="text-xs text-slate-400">Instructions for local testing, live persistent deployment, and admin lockdown.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+          <h3 class="font-orbitron font-semibold text-sm text-brand-cyan uppercase">1. Out-Of-The-Box Persistence</h3>
+          <p>This web application uses browser LocalStorage synchronization by default so all public submissions, record edits, and status changes remain saved instantly across web browser reloads.</p>
+
+          <h3 class="font-orbitron font-semibold text-sm text-brand-cyan uppercase">2. Connecting Live Cloud Firestore</h3>
+          <p>To connect your own live Cloud Firestore database:</p>
+          <ol class="list-decimal list-inside space-y-1 pl-2 text-slate-400 font-mono">
+            <li>Create a Firebase Project at console.firebase.google.com</li>
+            <li>Enable Cloud Firestore and Firebase Authentication (Email/Password)</li>
+            <li>Replace the `firebaseConfig` object in this page script with your project credentials</li>
+          </ol>
+
+          <h3 class="font-orbitron font-semibold text-sm text-brand-cyan uppercase">3. Recommended Firestore Security Rules</h3>
+          <div class="bg-slate-950 p-4 rounded-xl font-mono text-[11px] text-cyan-300 border border-slate-800">
+            rules_version = '2';<br>
+            service cloud.firestore {<br>
+            &nbsp;&nbsp;match /databases/{database}/documents {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /artifacts/{appId}/public/data/registrations/{document=**} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow create: if true; // Public registration submission<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read, update, delete: if request.auth != null && request.auth.token.email == 'admin@robotics.com';<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- EDIT REGISTRATION MODAL (Admin) -->
+  <div id="edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl p-6 space-y-4 border border-brand-cyan/40">
+      <div class="flex justify-between items-center border-b border-brand-border pb-3">
+        <h3 class="font-orbitron font-bold text-lg text-white">Edit Participant Record</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <input type="hidden" id="edit-record-id">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 uppercase font-semibold mb-1">Full Name</label>
+          <input type="text" id="edit-fullname" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 uppercase font-semibold mb-1">Age</label>
+            <input type="number" id="edit-age" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 uppercase font-semibold mb-1">Grade & Section</label>
+            <input type="text" id="edit-grade" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 uppercase font-semibold mb-1">Team Name (If Applicable)</label>
+          <input type="text" id="edit-team-name" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 uppercase font-semibold mb-1">Approval Status</label>
+          <select id="edit-status" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white outline-none">
+            <option value="Approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-3 border-t border-brand-border">
+        <button onclick="closeEditModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-semibold">Cancel</button>
+        <button onclick="saveEditRecord()" class="px-4 py-2 bg-brand-electric hover:bg-blue-600 text-white rounded text-xs font-semibold">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM SYSTEM RESET MODAL (Admin) -->
+  <div id="reset-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-rose-500/40">
+      <div class="flex items-center space-x-3 text-rose-400 border-b border-brand-border pb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        <h3 class="font-orbitron font-bold text-lg text-white">Reset System Database</h3>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Are you sure you want to clear all registered participants and entries? This will delete all records, reset all counter metrics to 0, and clear active filters.
+      </p>
+
+      <div class="flex justify-end space-x-2 pt-3 border-t border-brand-border">
+        <button onclick="closeResetModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-semibold">Cancel</button>
+        <button onclick="confirmResetSystem()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded text-xs">Clear All Registrations</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
+  <script>
+    // INITIALIZE DATA STORE & ADMIN SESSION
+    const STORAGE_KEY = 'robotics_competition_registrations_2026';
+    const ADMIN_SESSION_KEY = 'robotics_admin_session_2026';
+    
+    let isAdminAuthenticated = false;
+    let registrations = [];
+
+    // Load initial stored registrations or initialize clean array
+    function initData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          registrations = JSON.parse(stored);
+        } catch(e) {
+          registrations = [];
+        }
+      } else {
+        registrations = [];
+        saveData();
+      }
+
+      // Check existing admin session
+      const adminSession = localStorage.getItem(ADMIN_SESSION_KEY);
+      if (adminSession === 'true') {
+        isAdminAuthenticated = true;
+        updateAdminBadgeState();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations));
+    }
+
+    function updateAdminBadgeState() {
+      const badge = document.getElementById('admin-auth-badge');
+      if (badge) {
+        if (isAdminAuthenticated) {
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    // TAB NAVIGATION SWITCHER
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const activeTab = document.getElementById(`tab-${tabId}`);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      // Update Nav active styles
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-electric/20', 'text-brand-cyan', 'border-brand-cyan/30');
+        btn.classList.add('text-slate-300', 'border-transparent');
+      });
+
+      const activeNavBtn = document.getElementById(`nav-${tabId}`);
+      if (activeNavBtn) {
+        activeNavBtn.classList.add('bg-brand-electric/20', 'text-brand-cyan', 'border-brand-cyan/30');
+        activeNavBtn.classList.remove('text-slate-300', 'border-transparent');
+      }
+
+      // Refresh icons
+      if (window.lucide) lucide.createIcons();
+
+      if (tabId === 'admin-dashboard') {
+        renderAdminTable();
+      }
+    }
+
+    function handleAdminNavClick() {
+      if (isAdminAuthenticated) {
+        switchTab('admin-dashboard');
+      } else {
+        switchTab('admin-login');
+      }
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    // ADMIN AUTHENTICATION
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('admin-email').value.trim();
+      const password = document.getElementById('admin-password').value.trim();
+
+      if ((email === 'admin@robotics.com' || email === 'admin@robotics.org') && (password === 'admin123456' || password === 'AdminRobotics2026!')) {
+        isAdminAuthenticated = true;
+        localStorage.setItem(ADMIN_SESSION_KEY, 'true');
+        updateAdminBadgeState();
+        showToast('Admin authentication successful!', 'success');
+        switchTab('admin-dashboard');
+      } else {
+        showToast('Invalid admin credentials. Please use demo login.', 'error');
+      }
+    }
+
+    function autoFillAndLoginDemoAdmin() {
+      document.getElementById('admin-email').value = 'admin@robotics.com';
+      document.getElementById('admin-password').value = 'admin123456';
+      
+      isAdminAuthenticated = true;
+      localStorage.setItem(ADMIN_SESSION_KEY, 'true');
+      updateAdminBadgeState();
+      showToast('Authenticated using Demo Credentials!', 'success');
+      switchTab('admin-dashboard');
+    }
+
+    function handleAdminLogout() {
+      isAdminAuthenticated = false;
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      updateAdminBadgeState();
+      showToast('Logged out of Admin Control Center.', 'info');
+      switchTab('public-registration');
+    }
+
+    // DYNAMIC TEAM MEMBER INPUT FORM GENERATION
+    function updateTeamFields() {
+      const teamCheckboxes = document.querySelectorAll('input[name="competitions"][data-type="team"]:checked');
+      const teamDetailsSec = document.getElementById('team-details-section');
+      const membersContainer = document.getElementById('team-members-container');
+
+      if (teamCheckboxes.length === 0) {
+        teamDetailsSec.classList.add('hidden');
+        membersContainer.innerHTML = '';
+        return;
+      }
+
+      teamDetailsSec.classList.remove('hidden');
+
+      let maxSize = 0;
+      teamCheckboxes.forEach(cb => {
+        const sz = parseInt(cb.getAttribute('data-size') || '0');
+        if (sz > maxSize) maxSize = sz;
+      });
+
+      const additionalMembersNeeded = Math.max(0, maxSize - 1);
+      membersContainer.innerHTML = '';
+
+      if (additionalMembersNeeded > 0) {
+        const title = document.createElement('p');
+        title.className = 'text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2';
+        title.innerText = `Additional Team Members Required (${additionalMembersNeeded} Total):`;
+        membersContainer.appendChild(title);
+
+        for (let i = 1; i <= additionalMembersNeeded; i++) {
+          const div = document.createElement('div');
+          div.className = 'flex items-center space-x-2';
+          div.innerHTML = `
+            <span class="text-xs font-mono text-brand-cyan w-20">Member ${i+1}:</span>
+            <input type="text" name="teamMemberName" required placeholder="Full Name of Member ${i+1}"
+              class="flex-grow bg-slate-900/80 border border-slate-700 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan rounded-lg px-4 py-2 text-white placeholder-slate-500 outline-none text-sm">
+          `;
+          membersContainer.appendChild(div);
+        }
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // REGISTRATION FORM SUBMISSION HANDLER
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('reg-fullname').value.trim();
+      const age = parseInt(document.getElementById('reg-age').value);
+      const grade = document.getElementById('reg-grade').value.trim();
+
+      const selectedCBs = Array.from(document.querySelectorAll('input[name="competitions"]:checked'));
+      if (selectedCBs.length === 0) {
+        showToast('Please select at least one competition category.', 'error');
+        return;
+      }
+
+      const selectedCompetitions = selectedCBs.map(cb => cb.value);
+      const hasTeamComp = selectedCBs.some(cb => cb.getAttribute('data-type') === 'team');
+
+      let teamName = '';
+      let teamCaptain = '';
+      let teamMembers = [];
+
+      if (hasTeamComp) {
+        teamName = document.getElementById('reg-team-name').value.trim();
+        teamCaptain = document.getElementById('reg-team-captain').value.trim();
+
+        if (!teamName || !teamCaptain) {
+          showToast('Please provide your Team Name and Captain Name.', 'error');
+          return;
+        }
+
+        const memberInputs = document.querySelectorAll('input[name="teamMemberName"]');
+        for (let input of memberInputs) {
+          if (!input.value.trim()) {
+            showToast('Please complete all team member names.', 'error');
+            return;
+          }
+          teamMembers.push(input.value.trim());
+        }
+      }
+
+      const randomCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const registrationId = `ROB-2026-${randomCode}`;
+
+      const newRegistration = {
+        id: registrationId,
+        fullName,
+        age,
+        grade,
+        competitions: selectedCompetitions,
+        isTeam: hasTeamComp,
+        teamName,
+        teamCaptain,
+        teamMembers,
+        status: 'Pending',
+        timestamp: new Date().toISOString()
+      };
+
+      registrations.push(newRegistration);
+      saveData();
+
+      displayPass(newRegistration);
+      showToast('Registration submitted successfully!', 'success');
+      document.getElementById('registration-form').reset();
+      updateTeamFields();
+      switchTab('registration-lookup');
+    }
+
+    // DISPLAY REGISTRATION PASS CARD
+    function displayPass(record) {
+      document.getElementById('pass-id').innerText = record.id;
+      document.getElementById('pass-name').innerText = record.fullName;
+      document.getElementById('pass-grade').innerText = record.grade;
+      document.getElementById('pass-age').innerText = record.age;
+
+      const statusEl = document.getElementById('pass-status');
+      statusEl.innerText = record.status.toUpperCase();
+      if (record.status === 'Approved') {
+        statusEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      } else if (record.status === 'Rejected') {
+        statusEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded bg-red-500/20 text-red-400 border border-red-500/30';
+      } else {
+        statusEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/30';
+      }
+
+      const eventsDiv = document.getElementById('pass-events');
+      eventsDiv.innerHTML = record.competitions.map(c => 
+        `<span class="px-2.5 py-1 bg-slate-800 text-slate-200 text-xs rounded border border-slate-700 font-medium">${c}</span>`
+      ).join('');
+
+      const teamInfoSec = document.getElementById('pass-team-info');
+      if (record.isTeam) {
+        teamInfoSec.classList.remove('hidden');
+        document.getElementById('pass-team-name').innerText = record.teamName;
+        document.getElementById('pass-team-captain').innerText = record.teamCaptain;
+        document.getElementById('pass-team-members').innerText = record.teamMembers.join(', ') || 'N/A';
+      } else {
+        teamInfoSec.classList.add('hidden');
+      }
+    }
+
+    // PASS LOOKUP BY ID
+    function handleLookupPass() {
+      const query = document.getElementById('lookup-id-input').value.trim().toUpperCase();
+      const match = registrations.find(r => r.id === query);
+      if (match) {
+        displayPass(match);
+        showToast('Registration Record Found!', 'success');
+      } else {
+        showToast('No record found for ID: ' + query, 'error');
+      }
+    }
+
+    // SYSTEM RESET FUNCTIONS
+    function openResetModal() {
+      document.getElementById('reset-modal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
+
+    function confirmResetSystem() {
+      registrations = [];
+      saveData();
+
+      const searchInput = document.getElementById('admin-search-input');
+      const compFilter = document.getElementById('admin-filter-competition');
+      const typeFilter = document.getElementById('admin-filter-type');
+      const statusFilter = document.getElementById('admin-filter-status');
+
+      if (searchInput) searchInput.value = '';
+      if (compFilter) compFilter.value = 'ALL';
+      if (typeFilter) typeFilter.value = 'ALL';
+      if (statusFilter) statusFilter.value = 'ALL';
+
+      closeResetModal();
+      renderAdminTable();
+      showToast('System registrations cleared successfully.', 'info');
+    }
+
+    // LOAD SAMPLE MOCK DATA FOR TESTING
+    function loadMockSampleData() {
+      const sampleRecords = [
+        {
+          id: 'ROB-2026-X89K2',
+          fullName: 'Alex Rivera',
+          age: 16,
+          grade: 'Grade 10 - STEM A',
+          competitions: ['Soccer 2v2', 'Obstacle Avoidance'],
+          isTeam: true,
+          teamName: 'Cyber Titans',
+          teamCaptain: 'Alex Rivera',
+          teamMembers: ['Jordan Lee'],
+          status: 'Approved',
+          timestamp: new Date().toISOString()
+        },
+        {
+          id: 'ROB-2026-N74B1',
+          fullName: 'Samantha Cruz',
+          age: 15,
+          grade: 'Grade 9 - Robotics',
+          competitions: ['Nano Car Racing', 'Drag Racing'],
+          isTeam: false,
+          teamName: '',
+          teamCaptain: '',
+          teamMembers: [],
+          status: 'Pending',
+          timestamp: new Date().toISOString()
+        },
+        {
+          id: 'ROB-2026-M33P9',
+          fullName: 'Marcus Vance',
+          age: 17,
+          grade: 'Grade 11 - STEM B',
+          competitions: ['Sumo 2v2', 'Drag and Brake'],
+          isTeam: true,
+          teamName: 'Apex Mechs',
+          teamCaptain: 'Marcus Vance',
+          teamMembers: ['Liam Parker'],
+          status: 'Approved',
+          timestamp: new Date().toISOString()
+        }
+      ];
+
+      registrations = [...registrations, ...sampleRecords];
+      saveData();
+      renderAdminTable();
+      showToast('Mock sample entries loaded.', 'success');
+    }
+
+    // RENDER ADMIN DASHBOARD DATA & METRICS
+    function renderAdminTable() {
+      if (!isAdminAuthenticated) return;
+
+      const tbody = document.getElementById('admin-table-body');
+      const searchVal = (document.getElementById('admin-search-input')?.value || '').toLowerCase();
+      const compFilter = document.getElementById('admin-filter-competition')?.value || 'ALL';
+      const typeFilter = document.getElementById('admin-filter-type')?.value || 'ALL';
+      const statusFilter = document.getElementById('admin-filter-status')?.value || 'ALL';
+
+      document.getElementById('metric-total-participants').innerText = registrations.length;
+      
+      let totalEntries = 0;
+      let teamRegsCount = 0;
+      let pendingCount = 0;
+
+      registrations.forEach(r => {
+        totalEntries += r.competitions.length;
+        if (r.isTeam) teamRegsCount++;
+        if (r.status === 'Pending') pendingCount++;
+      });
+
+      document.getElementById('metric-total-entries').innerText = totalEntries;
+      document.getElementById('metric-team-count').innerText = teamRegsCount;
+      document.getElementById('metric-pending-count').innerText = pendingCount;
+
+      const filtered = registrations.filter(r => {
+        const matchesSearch = r.fullName.toLowerCase().includes(searchVal) ||
+                              r.id.toLowerCase().includes(searchVal) ||
+                              (r.teamName && r.teamName.toLowerCase().includes(searchVal));
+
+        const matchesComp = compFilter === 'ALL' || r.competitions.includes(compFilter);
+        const matchesType = typeFilter === 'ALL' || 
+                            (typeFilter === 'TEAM' && r.isTeam) || 
+                            (typeFilter === 'INDIVIDUAL' && !r.isTeam);
+
+        const matchesStatus = statusFilter === 'ALL' || r.status === statusFilter;
+
+        return matchesSearch && matchesComp && matchesType && matchesStatus;
+      });
+
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        document.getElementById('no-records-msg').classList.remove('hidden');
+      } else {
+        document.getElementById('no-records-msg').classList.add('hidden');
+        
+        filtered.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-800/40 transition-colors';
+
+          let statusBadgeClass = 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+          if (r.status === 'Approved') statusBadgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+          if (r.status === 'Rejected') statusBadgeClass = 'bg-red-500/20 text-red-400 border-red-500/30';
+
+          tr.innerHTML = `
+            <td class="p-4 font-mono font-bold text-brand-cyan">${r.id}</td>
+            <td class="p-4">
+              <div class="font-bold text-white">${r.fullName}</div>
+              <div class="text-[10px] text-slate-400">Age: ${r.age}</div>
+            </td>
+            <td class="p-4 text-slate-300">${r.grade}</td>
+            <td class="p-4">
+              <div class="flex flex-wrap gap-1">
+                ${r.competitions.map(c => `<span class="px-2 py-0.5 bg-slate-800 text-slate-200 text-[10px] rounded border border-slate-700">${c}</span>`).join('')}
+              </div>
+            </td>
+            <td class="p-4">
+              ${r.isTeam ? `
+                <div class="font-semibold text-cyan-300">${r.teamName}</div>
+                <div class="text-[10px] text-slate-400">Capt: ${r.teamCaptain}</div>
+              ` : '<span class="text-slate-500">Individual</span>'}
+            </td>
+            <td class="p-4">
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded border ${statusBadgeClass}">
+                ${r.status}
+              </span>
+            </td>
+            <td class="p-4 text-right space-x-1">
+              <button onclick="openEditModal('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded" title="Edit">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="toggleApproval('${r.id}')" class="p-1.5 bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-700 rounded" title="Toggle Status">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteRecord('${r.id}')" class="p-1.5 bg-red-950 hover:bg-red-800 text-red-400 border border-red-800 rounded" title="Delete">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      renderCompetitionCounts();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // RENDER ENTRIES COUNT PER EVENT
+    function renderCompetitionCounts() {
+      const categories = [
+        'Soccer 2v2', 'Soccer 3v3', 'Soccer 5v5', 'Sumo 2v2',
+        'Individual Robo Soccer', 'Individual Robo Sumo', 'Nano Car Racing',
+        'Drag Racing', 'Obstacle Avoidance', 'Precision Parking', 'Drag and Brake'
+      ];
+
+      const counts = {};
+      categories.forEach(c => counts[c] = 0);
+
+      registrations.forEach(r => {
+        r.competitions.forEach(c => {
+          if (counts[c] !== undefined) counts[c]++;
+        });
+      });
+
+      const container = document.getElementById('competition-counts-grid');
+      if (!container) return;
+
+      container.innerHTML = categories.map(cat => `
+        <div class="glass-card p-3 rounded-lg border border-brand-border flex justify-between items-center">
+          <span class="text-xs text-slate-300 font-medium truncate pr-2">${cat}</span>
+          <span class="px-2 py-0.5 bg-brand-electric/20 text-brand-cyan text-xs font-mono font-bold rounded border border-brand-cyan/30">${counts[cat]}</span>
+        </div>
+      `).join('');
+    }
+
+    // RECORD EDITING & MANAGEMENT ACTIONS
+    function toggleApproval(id) {
+      const rec = registrations.find(r => r.id === id);
+      if (rec) {
+        rec.status = rec.status === 'Approved' ? 'Pending' : 'Approved';
+        saveData();
+        renderAdminTable();
+        showToast(`Status updated for ${rec.id}`, 'info');
+      }
+    }
+
+    function deleteRecord(id) {
+      if (confirm(`Are you sure you want to delete registration ${id}?`)) {
+        registrations = registrations.filter(r => r.id !== id);
+        saveData();
+        renderAdminTable();
+        showToast('Registration deleted.', 'info');
+      }
+    }
+
+    function openEditModal(id) {
+      const rec = registrations.find(r => r.id === id);
+      if (!rec) return;
+
+      document.getElementById('edit-record-id').value = rec.id;
+      document.getElementById('edit-fullname').value = rec.fullName;
+      document.getElementById('edit-age').value = rec.age;
+      document.getElementById('edit-grade').value = rec.grade;
+      document.getElementById('edit-team-name').value = rec.teamName || '';
+      document.getElementById('edit-status').value = rec.status;
+
+      document.getElementById('edit-modal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    function saveEditRecord() {
+      const id = document.getElementById('edit-record-id').value;
+      const rec = registrations.find(r => r.id === id);
+      if (rec) {
+        rec.fullName = document.getElementById('edit-fullname').value.trim();
+        rec.age = parseInt(document.getElementById('edit-age').value);
+        rec.grade = document.getElementById('edit-grade').value.trim();
+        rec.teamName = document.getElementById('edit-team-name').value.trim();
+        rec.status = document.getElementById('edit-status').value;
+
+        saveData();
+        renderAdminTable();
+        closeEditModal();
+        showToast('Record saved successfully.', 'success');
+      }
+    }
+
+    // EXPORT TO CSV
+    function exportToCSV() {
+      if (registrations.length === 0) {
+        showToast('No registration data available to export.', 'error');
+        return;
+      }
+
+      let csv = 'Registration ID,Full Name,Age,Grade Section,Competitions,Type,Team Name,Team Captain,Team Members,Status,Date\n';
+
+      registrations.forEach(r => {
+        const comps = `"${r.competitions.join('; ')}"`;
+        const members = `"${r.teamMembers.join('; ')}"`;
+        csv += `"${r.id}","${r.fullName}",${r.age},"${r.grade}",${comps},"${r.isTeam ? 'Team' : 'Individual'}","${r.teamName || ''}","${r.teamCaptain || ''}",${members},"${r.status}","${r.timestamp}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `Robotics_Registrations_2026.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('CSV Export initiated.', 'success');
+    }
+
+    // TOAST NOTIFICATIONS
+    function showToast(msg, type = 'info') {
+      const banner = document.getElementById('toast-banner');
+      const message = document.getElementById('toast-message');
+      
+      message.innerText = msg;
+      banner.classList.remove('hidden', 'bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300', 'bg-red-950/80', 'border-red-500', 'text-red-300', 'bg-blue-950/80', 'border-blue-500', 'text-blue-300');
+
+      if (type === 'success') {
+        banner.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+      } else if (type === 'error') {
+        banner.classList.add('bg-red-950/80', 'border-red-500', 'text-red-300');
+      } else {
+        banner.classList.add('bg-blue-950/80', 'border-blue-500', 'text-blue-300');
+      }
+
+      setTimeout(() => {
+        closeToast();
+      }, 4000);
+    }
+
+    function closeToast() {
+      document.getElementById('toast-banner').classList.add('hidden');
+    }
+
+    // APPLICATION LAUNCH INITIALIZER
+    window.onload = function() {
+      initData();
+      if (window.lucide) lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
